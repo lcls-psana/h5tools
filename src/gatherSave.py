@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 import inspect
 import numpy as np
@@ -207,10 +208,10 @@ def gatherSave(dataSource,
                     storedEvents += 1
                     if (status is not None) and (status > 0) and (eventNumber % status == 0) and \
                        (bytesPerStoredEvent is not None):
-                        print "run=%4.4d calib=%4.4d eventInStep=%4.4d eventNumber=%4.4d arrays: length=%4.4d" % \
-                            (runNumber, calibNumber, eventInStep,eventNumber, storedEvents),
+                        print("run=%4.4d calib=%4.4d eventInStep=%4.4d eventNumber=%4.4d arrays: length=%4.4d" % \
+                            (runNumber, calibNumber, eventInStep,eventNumber, storedEvents), end=' ')
                         totalMem = memoryHumanReadable(bytesPerStoredEvent * storedEvents)
-                        print " memory: %s" % totalMem
+                        print(" memory: %s" % totalMem)
     except BreakOutException:
         pass
     # shrink arrays to number of events we stored data from
@@ -306,8 +307,8 @@ def fillInputs(inputs, epicsStore, evt):
                                     "spelled correctly?") % pvName
             if pv.isCtrl():
                 goodEvent = False
-                print "warning: pv isCtrl for %s. Possible known or new DAQ problem." % (evt.get(psana.EventId))
-                print " Contact LCLS with experiment, run number and above eventid. (email pcds-help)"
+                print("warning: pv isCtrl for %s. Possible known or new DAQ problem." % (evt.get(psana.EventId)))
+                print(" Contact LCLS with experiment, run number and above eventid. (email pcds-help)")
                 break
             inputDict[inputArgName]=pv
         else:

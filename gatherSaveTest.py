@@ -1,3 +1,4 @@
+from __future__ import print_function
 import psana
 import h5tools
 
@@ -26,8 +27,8 @@ if __name__ == '__main__':
     h5output = "myoutput.h5"
     numEvents = 15
     status = 5
-    print "Test of h5tools.gatherSave to write out data",
-    print "from %d events to the file: '%s' with status every %d events" % (numEvents,h5output,status)
+    print("Test of h5tools.gatherSave to write out data", end=' ')
+    print("from %d events to the file: '%s' with status every %d events" % (numEvents,h5output,status))
     h5tools.gatherSave(dataSource="exp=cxitut13:run=22",
                        h5OutputFileName=h5output,
                        inputOutputFunction=myGatherFoo,
@@ -41,13 +42,13 @@ if __name__ == '__main__':
                        status=status,
                        numEvents=numEvents)
     dataArray, timeArray, posArray = h5tools.H5ReadDataTimePos(h5output)
-    print "-- Object representation for first rows of numpy arrays read back from hdf5 file:--"
-    print "** data[0:3] **"
-    print "%r" % dataArray[0:3]
-    print
-    print "** time[0:3] **"
-    print "%r" % timeArray[0:3]
-    print
-    print "** pos[0:3] **"
-    print "%r" % posArray[0:3]
+    print("-- Object representation for first rows of numpy arrays read back from hdf5 file:--")
+    print("** data[0:3] **")
+    print("%r" % dataArray[0:3])
+    print()
+    print("** time[0:3] **")
+    print("%r" % timeArray[0:3])
+    print()
+    print("** pos[0:3] **")
+    print("%r" % posArray[0:3])
 

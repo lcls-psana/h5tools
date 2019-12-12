@@ -17,6 +17,7 @@ This function is designed to work with a datasets of a compound type
 
 @author David Schneider
 '''
+from __future__ import print_function
 
 import h5py
 
@@ -111,7 +112,7 @@ def printds(ds, rows=None, fields=None, skipfields=None, formatdict=None):
     multiline = []
     if datasetIsScalar:
       if rows:
-        print "warning: dataset is scalar, ignoring rows"
+        print("warning: dataset is scalar, ignoring rows")
         rows = None
       dsArray = ds
       rowIdxCells = ['','','','']
@@ -178,8 +179,8 @@ def printds(ds, rows=None, fields=None, skipfields=None, formatdict=None):
     elif enumDict and vlenType is None and baseEnumDict is None and not fldIsArray:
       fieldValues,types = getEnumValues(dsArray,datasetIsArray,fld,enumDict)
       if set([int,str]) == types:
-        print "warning: dset=%s enum field=%s some values not in the enumeration" % \
-          (ds.name, fieldName)
+        print("warning: dset=%s enum field=%s some values not in the enumeration" % \
+          (ds.name, fieldName))
       printData = ['',fld,'enum'] + fieldValues
       columns.append(printData)
       multiline.append([1 for x in printData])
@@ -199,8 +200,8 @@ def printds(ds, rows=None, fields=None, skipfields=None, formatdict=None):
           baseNameForPrint = 'enum'
           columnData,types = getEnumValues(dsArray,datasetIsArray,fld,baseEnumDict,arrayColumn)
           if set([int,str]) == types and not havePrintedEnumTypeWarning:
-            print "warning: dset=%s array of enum field=%s some values not in the enumeration" % \
-              (ds.name, fieldName)
+            print("warning: dset=%s array of enum field=%s some values not in the enumeration" % \
+              (ds.name, fieldName))
             havePrintedEnumTypeWarning = True
           arrayColumns.append(columnData)
       joinedArrayColumn = joinColumns(', ',arrayColumns)
@@ -252,7 +253,7 @@ def printds(ds, rows=None, fields=None, skipfields=None, formatdict=None):
 
   printColumns = joinColumns(' ',columns, multiline)
   for row in printColumns:
-    print row
+    print(row)
 
 ##############################
 # Helper functions
