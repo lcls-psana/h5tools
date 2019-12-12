@@ -149,7 +149,7 @@ def printds(ds, rows=None, fields=None, skipfields=None, formatdict=None):
       printData =  [ formatdict[fld] % dsArray[fld] ]
     else:
       fldData = dsArray[fld]
-      printData = map( lambda(x): formatdict[fld] % x, fldData )
+      printData = map( lambda x: formatdict[fld] % x, fldData )
     return printData
 
   ############## begin function
@@ -195,7 +195,7 @@ def printds(ds, rows=None, fields=None, skipfields=None, formatdict=None):
             columnData = dsArray[fld][:,arrayColumn]
           else:
             columnData = [ dsArray[fld][arrayColumn] ]
-          arrayColumns.append(map(lambda(x): formatdict[fld] % x, columnData))
+          arrayColumns.append(map(lambda x: formatdict[fld] % x, columnData))
         elif baseEnumDict:
           baseNameForPrint = 'enum'
           columnData,types = getEnumValues(dsArray,datasetIsArray,fld,baseEnumDict,arrayColumn)
@@ -224,7 +224,7 @@ def printds(ds, rows=None, fields=None, skipfields=None, formatdict=None):
       for rec in vlenData:
         linesPerRec.append(len(rec))
         for vlenColIdx,subFld in enumerate(vlenRecordFieldNames):
-          vlenColumns[vlenColIdx].extend(map(lambda(x): formatdict[fld] % x, rec[subFld]))
+          vlenColumns[vlenColIdx].extend(map(lambda x: formatdict[fld] % x, rec[subFld]))
       joinedVlenColumn = joinColumns(', ',vlenColumns)
       joinedVlenColumn = joinedVlenColumn[0:2] + [ '(' + x + ')' for x in joinedVlenColumn[2:]]
       joinedWithBrackets = ['  ' + x for x in joinedVlenColumn[0:2]]

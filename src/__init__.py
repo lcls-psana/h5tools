@@ -16,8 +16,9 @@ part of it, please give an appropriate acknowledgment.
 
 @author $Author$
 """
+from __future__ import absolute_import
 
-from printds import printds
-from gatherSave import gatherSave, H5ReadDataTimePos
+from .printds import printds
+from .gatherSave import gatherSave, H5ReadDataTimePos
 
 
