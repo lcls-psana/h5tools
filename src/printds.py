@@ -99,9 +99,9 @@ def printds(ds, rows=None, fields=None, skipfields=None, formatdict=None):
 
   def setUpFormatDict(formatdict,allFieldNames):
     if formatdict:
-      checkThatFieldsExist(formatdict.keys(), allFieldNames)
+      checkThatFieldsExist(list(formatdict.keys()), allFieldNames)
       for fld in fieldNames:
-        if fld not in formatdict.keys():
+        if fld not in list(formatdict.keys()):
           formatdict[fld]="%s"
     else:
       formatdict = dict(zip(fieldNames,["%s" for fld in fieldNames]))
@@ -121,8 +121,8 @@ def printds(ds, rows=None, fields=None, skipfields=None, formatdict=None):
         dsArray = ds[rows]
       else:
         dsArray = ds[...]
-        rows = range(len(ds))
-      rowIdxCells = ['','rowIdx',''] + map(str,rows)
+        rows = list(range(len(ds)))
+      rowIdxCells = ['','rowIdx',''] + list(map(str,rows))
     else:
       raise Exception("ds is neither scalar nor 1D array, array dim is %d" % len(ds.shape))
     columns.append(rowIdxCells)
@@ -149,7 +149,7 @@ def printds(ds, rows=None, fields=None, skipfields=None, formatdict=None):
       printData =  [ formatdict[fld] % dsArray[fld] ]
     else:
       fldData = dsArray[fld]
-      printData = map( lambda x: formatdict[fld] % x, fldData )
+      printData = [formatdict[fld] % x for x in fldData]
     return printData
 
   ############## begin function
@@ -195,7 +195,7 @@ def printds(ds, rows=None, fields=None, skipfields=None, formatdict=None):
             columnData = dsArray[fld][:,arrayColumn]
           else:
             columnData = [ dsArray[fld][arrayColumn] ]
-          arrayColumns.append(map(lambda x: formatdict[fld] % x, columnData))
+          arrayColumns.append([formatdict[fld] % x for x in columnData])
         elif baseEnumDict:
           baseNameForPrint = 'enum'
           columnData,types = getEnumValues(dsArray,datasetIsArray,fld,baseEnumDict,arrayColumn)
@@ -224,7 +224,7 @@ def printds(ds, rows=None, fields=None, skipfields=None, formatdict=None):
       for rec in vlenData:
         linesPerRec.append(len(rec))
         for vlenColIdx,subFld in enumerate(vlenRecordFieldNames):
-          vlenColumns[vlenColIdx].extend(map(lambda x: formatdict[fld] % x, rec[subFld]))
+          vlenColumns[vlenColIdx].extend([formatdict[fld] % x for x in rec[subFld]])
       joinedVlenColumn = joinColumns(', ',vlenColumns)
       joinedVlenColumn = joinedVlenColumn[0:2] + [ '(' + x + ')' for x in joinedVlenColumn[2:]]
       joinedWithBrackets = ['  ' + x for x in joinedVlenColumn[0:2]]
@@ -305,7 +305,7 @@ def getEnumValues(dsSource,arrayField,fieldName,enumDict,column=None):
     enumValues  usually a list of strings (if arrayField=True) or a scalar value
          types  set of all types returns - str,int or str, or possibly just int
   '''
-  invertedEnumDict = dict([(intVal, strVal) for strVal,intVal in enumDict.iteritems()])
+  invertedEnumDict = dict([(intVal, strVal) for strVal,intVal in enumDict.items()])
   if arrayField:
     if column is None:
       enumValues = [invertedEnumDict.get(x,int(x)) for x in dsSource[fieldName] ]
@@ -348,7 +348,7 @@ def joinColumns(joinStr, columns, multiline=None):
   take the next three from column 0 and the next 2 from column 1 to produce the next three lines
   for 'row' 2 of the merged column.
   '''
-  widths = map(max,[map(len,col) for col in columns])
+  widths = list(map(max,[list(map(len,col)) for col in columns]))
   if multiline is None:
     joinedColumn = []
     for row in range(len(columns[0])):
@@ -357,7 +357,7 @@ def joinColumns(joinStr, columns, multiline=None):
       joinedColumn.append(joinStr.join(widthCells))
     return joinedColumn
   else:
-    multilineLens = map(len,multiline)
+    multilineLens = list(map(len,multiline))
     assert all([multilineLens[0] == x for x in multilineLens]), "multiline entries not the same across columns"
     assert len(multiline) == len(columns), "len of multiline list must equal len of column list"
     paddedColumns = [ [] for col in columns ]

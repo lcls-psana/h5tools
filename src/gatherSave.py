@@ -175,7 +175,7 @@ def gatherSave(dataSource,
                     if len(inputDict)==0:
                         continue
                     if extraInputs is not None:
-                        for ky,val in extraInputs.iteritems():
+                        for ky,val in extraInputs.items():
                             inputDict[ky]=val
                     eventId = evt.get(psana.EventId)
                     if whichEvent:
@@ -188,7 +188,7 @@ def gatherSave(dataSource,
                     if len(h5outputs)==0:
                         continue
                     if isinstance(h5outputs,dict):
-                        h5outputs = [(k,v) for k,v in h5outputs.iteritems()]
+                        h5outputs = [(k,v) for k,v in h5outputs.items()]
                     if dataArray is None:
                         dataDtype = getDtype(h5outputs)
                         dataArray, timeArray, posArray = createArrays()
@@ -256,7 +256,7 @@ def validateInputs(inputs, extraInputs, inputOutputFunction, whichEventArgs):
         assert isinstance(val,tuple) or isinstance(val,list), ("values of inputs dict "+\
                                                                "must be lists or tuples")
         assert len(val)>=2, "values of inputs dict must have at least 2 elements"
-    for inputArgName, getTuple in inputs.iteritems():
+    for inputArgName, getTuple in inputs.items():
         psanaType = getTuple[0]
         if psanaType == psana.Epics:
             pvName = getTuple[1]
@@ -274,7 +274,7 @@ def validateInputs(inputs, extraInputs, inputOutputFunction, whichEventArgs):
         assert isinstance(extraInputs,dict), "extraInput must be a dict"
         for ky in extraInputs.keys():
             assert isinstance(ky,str), "keys in extraInput dict must be strings"
-            assert ky not in inputs.keys(), "extraInput key: %s collides with keys in inputs, change names" % ky
+            assert ky not in list(inputs.keys()), "extraInput key: %s collides with keys in inputs, change names" % ky
             assert ky in userArgs, ("keys of the extraInput dict must be names of arguments " + \
                                    "to the inputOutputFunction, however '%s' is in the extraInputs dict, " + \
                                    "but not the name of a function argument") % ky
@@ -298,7 +298,7 @@ def validateInputs(inputs, extraInputs, inputOutputFunction, whichEventArgs):
 def fillInputs(inputs, epicsStore, evt):
     inputDict = {}
     goodEvent = True
-    for inputArgName, getTuple in inputs.iteritems():
+    for inputArgName, getTuple in inputs.items():
         psanaType = getTuple[0]
         if psanaType == psana.Epics:
             pvName = getTuple[1]
