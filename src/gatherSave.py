@@ -18,9 +18,9 @@ def gatherSave(dataSource,
                overwrite=False,
                numEvents=None,
                status=None):
-    '''Gathers data from a Psana datasource and writes it all at once to an hdf5 file. 
+    '''Gathers data from a Psana datasource and writes it all at once to an hdf5 file.
     (gathered data must fit in memory).
-    
+
     ARGS:
     dataSource:          Psana datasource string, such as 'exp=cxitut13:run=22'
     h5OutputFileName:    name of hdf5 output file
@@ -28,7 +28,7 @@ def gatherSave(dataSource,
                          Returns event based data to write to hdf5 file.
     inputs:              dict describing inputs to extract from Psana event and
                          pass to inputOutputFunction. See below.
-    extraInputs:         dict of additional args to pass to inputOutputFunction 
+    extraInputs:         dict of additional args to pass to inputOutputFunction
                          (defaults to None)
     whichEvent:          when True, inputOutputFunction receives four additional arguments:
                            runNumber   which run this event is in, zero-up counter
@@ -44,17 +44,17 @@ def gatherSave(dataSource,
     numEvents:            set this to process a limited number of events in the dataSource.
                           useful for debugging.
     status:               set to an integer nth and a status is reported every event
-    
+
     An example of use would be:
 
     def myGather(diode, epicsPv):
        return {'aD':diode.channel0Volts(), 'pv':epicsPv.value(0) }
 
-    gatherSave('exp=cxitut13:run=22','myout.h5', myGather, 
+    gatherSave('exp=cxitut13:run=22','myout.h5', myGather,
                inputs={'diode':(psana.Ipimb.DataV2, psana.Source('DetInfo(CxiDg4.0:Ipimb.0)')),
                        'epicsPv':(psana.Epics, 'CXI:SC1:MZM:08:ENCPOSITIONGET')})
 
-    the keys of the inputs dict - 'diode', 'epicsPv', must exactly match the names of 
+    the keys of the inputs dict - 'diode', 'epicsPv', must exactly match the names of
     parameters to the function myGather.
 
     When myGather is called, it is passed Psana object retrieved from the epics store or event store.
@@ -62,8 +62,8 @@ def gatherSave(dataSource,
 
     evt.get(psana.Ipimb.DataV2, psana.Source('DetInfo(CxiDg4.0:Ipimb.0)'))
 
-    in for 'diode'.  Similarly the tuple 
-    (psana.Epics, 'CXI:SC1:MZM:08:ENCPOSITIONGET') 
+    in for 'diode'.  Similarly the tuple
+    (psana.Epics, 'CXI:SC1:MZM:08:ENCPOSITIONGET')
     means to get the named epics pv from the epics store.
 
     The result will be the file myout.h5 with the datasets 'data', 'time', 'step'
@@ -79,13 +79,13 @@ def gatherSave(dataSource,
     skip storing data for the event. When storing data, the keys and types of the data must
     always be the same. For instance, returning
     {'outputA':23}
-    and then 
+    and then
     {'outputA':25.5}
     will produce an error as the type changed from int to float.
     Likewise returning {'outputA':23} and then {'outputA':23, 'output2':1.1} produces an error.
-    
+
     You can wrap output in numpy types to control output, for instance:
-    
+
     import numpy as np
     def myGather(diode, epicsPv):
        return (('aD':np.float64(aDval)), ('pv':np.uint16(pvVal)))
@@ -93,13 +93,13 @@ def gatherSave(dataSource,
 
     The extraInputs argument allows the myGather function to do bookeeping, keep track of past
     events, or have constants passed in. For instance:
-    
+
     myconstants = {'MOTOR_POS':23.3}
 
     def myGather(epicsPv, myconstants):
       return {'aD': myconstants['MOTOR_POS']*epicsPv.value(0)}
 
-    gatherSave('exp=cxitut13:run=22','myout.h5', myGather, 
+    gatherSave('exp=cxitut13:run=22','myout.h5', myGather,
                inputs={'epicsPv':(psana.Epics, 'CXI:SC1:MZM:08:ENCPOSITIONGET')},
                extraInputs={'myconstants':myconstants})
 
@@ -117,7 +117,7 @@ def gatherSave(dataSource,
 
     blockSize = 100000
     dataDtype = None
-    timeDtype = np.dtype([('seconds',np.uint32),('nanoseconds',np.uint32), 
+    timeDtype = np.dtype([('seconds',np.uint32),('nanoseconds',np.uint32),
                           ('ticks',np.uint32), ('fiducials',np.uint32)])
     posDtype = np.dtype([('runNumber',np.uint32), ('stepNumber',np.uint32)])
     dataArray = None
@@ -145,7 +145,7 @@ def gatherSave(dataSource,
                 if type(v) != dataDtype[k]:
                     msg += " ** k=%s value=%s original type=%s new type=%s\n" % (k, v, dataDtype[k], type(v))
         assert all(valueTypeAgreement), msg
-        
+
     def storeToArrays(dataArray, timeArray, posArray, idx, dvals, evtId, run, calib):
         tm = evtId.time()
         timeValues = (tm[0],tm[1],evtId.ticks(), evtId.fiducials())
@@ -156,10 +156,10 @@ def gatherSave(dataSource,
 
     eventNumber = -1
     storedEvents = 0
-    
+
     if not overwrite:
         assert not os.path.exists(h5OutputFileName), "output file exists and overwrite not set"
-        
+
     assert len(h5DataSetNames)==3, "h5DataSetNames must contain three elments"
     assert all([isinstance(x,str) for x in h5DataSetNames]), "h5DataSetNames must be a list of three names"
 
@@ -183,7 +183,7 @@ def gatherSave(dataSource,
                         inputDict['stepNumber']=calib
                         inputDict['eventInStep']=eventInStep
                         inputDict['eventNumber']=eventNumber
-                        
+
                     h5outputs = inputOutputFunction(**inputDict)
                     if len(h5outputs)==0:
                         continue
@@ -194,7 +194,7 @@ def gatherSave(dataSource,
                         dataArray, timeArray, posArray = createArrays()
                         dataEventBuffer = np.zeros(1,dtype=dataDtype)
                         bytesPerStoredEvent = dataEventBuffer.nbytes + timeArray[0].nbytes + posArray[0].nbytes
-                        
+
                     if storedEvents >= timeArray.size:
                         timeArray.resize(timeArray.size + blockSize)
                         posArray.resize(posArray.size + blockSize)
@@ -232,12 +232,12 @@ def gatherSave(dataSource,
 def validateInputs(inputs, extraInputs, inputOutputFunction, whichEventArgs):
 
     # check that inputs is a dict,
-    # if whichEventArgs is not None, check that inputs keys do not include 
+    # if whichEventArgs is not None, check that inputs keys do not include
     # runNumber, stepNumber, etc
     # check that inputs keys are arguments to inputOutputFunction
     # if whichEventArgs, check that inputs keys do not collide with whichEventArgs
     # check that inputs values describe epics and psana objects correctly
-    
+
     assert isinstance(inputs,dict), "inputs must be a dict"
     assert isinstance(inputOutputFunction,type(validateInputs)),  "inputOutputFunction does not "+\
                                                       "appear to be a Python function"
@@ -290,7 +290,7 @@ def validateInputs(inputs, extraInputs, inputOutputFunction, whichEventArgs):
             assert ky in userArgs, "inputOutputFunction will be passed whichEvent args, " + \
                                    ("but arg %s is not a parameter to the function") % ky
             userArgs.remove(ky)
-            
+
     # check that all inputOutputFunction arguments are accounted for
     assert len(userArgs)==0, "inputOutputFunction can only take arguments described by inputs, "+\
                              ("extraInputs or whichEvent - however it takes additional arguments: %s") % userArgs
@@ -328,8 +328,8 @@ def getDtype(outputs):
     for xy in outputs:
         assert len(xy)==2, "each output entry must have two items - the field name and its value"
 
-    simpleTypes = set([float,np.float,np.float16, np.float32, np.float64, np.float128,
-                      int, np.int8, np.int16, np.int32, np.int64,
+    simpleTypes = set([float, np.float16, np.float32, np.float64, np.float128,
+                       int, np.int8, np.int16, np.int32, np.int64,
                        np.uint8, np.uint16, np.uint32, np.uint64])
     dtypeList = []
     for name,value in outputs:
@@ -338,13 +338,13 @@ def getDtype(outputs):
         assert valueType in simpleTypes, "output values can only be a simple type - a float or int. " + \
             " type for '%s' is %s" % (name,valueType)
         if valueType is float:
-            valueType = np.float
+            valueType = np.float32
         if valueType is int:
-            valueType = np.int
+            valueType = np.int32
         dtypeList.append((name,valueType))
 
     return np.dtype(dtypeList)
-        
+
 def H5WriteDataset(parent, dataName, dataArray):
     dataDtype = dataArray.dtype
     dataDset = parent.create_dataset(dataName, dataArray.shape, dataDtype)
